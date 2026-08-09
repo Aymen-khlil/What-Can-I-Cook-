@@ -268,7 +268,7 @@ function Index() {
                 >
                   <div className="gradient-warm flex h-28 items-center justify-center">
                     {(() => {
-                      const Icon = CARD_ICONS[i % CARD_ICONS.length];
+                      const Icon = CARD_ICONS[i % CARD_ICONS.length] ?? Utensils;
                       return (
                         <Icon
                           className="h-12 w-12 text-primary-foreground"
