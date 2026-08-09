@@ -4,7 +4,20 @@ import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { mockRecipes } from "./recipes.mock";
 import type { Recipe } from "./recipe-types";
 
-const RecipeSchema = z.object({
+const RecipeItem = z.object({
+  name: z.string(),
+  minutes: z.number(),
+  difficulty: z.string(),
+  description: z.string(),
+  uses: z.array(z.string()),
+  missing: z.array(z.string()),
+  ingredients: z.array(z.object({ item: z.string(), quantity: z.string() })),
+  steps: z.array(z.string()),
+});
+
+const RecipeSchema = z.preprocess(
+  (v) => (Array.isArray(v) ? { recipes: v } : v),
+  z.object({
   recipes: z
     .array(
       z.object({
@@ -18,9 +31,10 @@ const RecipeSchema = z.object({
         steps: z.array(z.string()),
       }),
     )
-    .min(3)
-    .max(5),
-});
+    .min(1)
+    .max(6),
+  }),
+);
 
 export async function generateRecipes(
   ingredients: string[],
@@ -38,9 +52,9 @@ export async function generateRecipes(
         "You are a warm, practical home-cooking assistant. Suggest realistic recipes that mostly use the ingredients the cook already has, plus common pantry staples. Keep missing ingredients to a minimum and clearly listed.",
       prompt: `Ingredients on hand: ${ingredients.join(", ")}.
 Maximum cooking time: ${maxMinutes} minutes.
-Return 4 recipes, each within the time limit. "uses" must list only ingredients the cook already has; "missing" lists anything else essential. Steps should be 4-7 short imperative sentences.`,
+Respond with a JSON object shaped exactly like {"recipes": [...]} containing 4 recipes, each within the time limit. "uses" must list only ingredients the cook already has; "missing" lists anything else essential. Steps should be 4-7 short imperative sentences.`,
     });
-    const output = await result.output;
+    const output = (await result.output) as z.infer<typeof RecipeSchema>;
     return { recipes: output.recipes as Recipe[], source: "ai" };
   } catch (err) {
     console.error("AI recipe generation failed, falling back to mock data", err);
