@@ -1,7 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
-import { ChefHat, Clock, Flame, Loader2, Plus, Sparkles, X } from "lucide-react";
+import {
+  ChefHat,
+  Clock,
+  CookingPot,
+  Croissant,
+  EggFried,
+  Flame,
+  Loader2,
+  Plus,
+  Salad,
+  Sparkles,
+  Utensils,
+  X,
+} from "lucide-react";
 
 import heroImage from "@/assets/hero-ingredients.jpg";
 import { Button } from "@/components/ui/button";
@@ -40,7 +53,7 @@ export const Route = createFileRoute("/")({
 
 const STORAGE_KEY = "wcic:ingredients";
 const TIME_OPTIONS = [10, 20, 30, 60];
-const EMOJI = ["🍳", "🥘", "🍲", "🥗", "🍝"];
+const CARD_ICONS = [EggFried, CookingPot, Salad, Croissant, Utensils];
 
 function timeLabel(m: number) {
   return m >= 60 ? "1 hour" : `${m} minutes`;
@@ -253,8 +266,17 @@ function Index() {
                   key={r.name + i}
                   className="surface-card flex flex-col overflow-hidden rounded-3xl border border-border shadow-soft transition-shadow hover:shadow-lift"
                 >
-                  <div className="gradient-warm flex h-28 items-center justify-center text-5xl">
-                    <span aria-hidden>{EMOJI[i % EMOJI.length]}</span>
+                  <div className="gradient-warm flex h-28 items-center justify-center">
+                    {(() => {
+                      const Icon = CARD_ICONS[i % CARD_ICONS.length];
+                      return (
+                        <Icon
+                          className="h-12 w-12 text-primary-foreground"
+                          aria-hidden
+                          strokeWidth={1.5}
+                        />
+                      );
+                    })()}
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     <h3 className="text-xl font-bold text-foreground">{r.name}</h3>
